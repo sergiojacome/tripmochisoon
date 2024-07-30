@@ -43,7 +43,7 @@
         <main class="max-w-4xl w-full bg-white rounded-lg shadow-xl overflow-hidden flex flex-col md:flex-row">
             <div class="w-full md:w-1/2 bg-blue-500 flex items-center justify-center p-8 md:p-0"
                 style="background: url('https://www.transparenttextures.com/patterns/beige-paper.png') repeat #faf0e6;">
-                <img src="MochiTrip.svg" alt="Logo de MochiTrip" class="max-w-full h-auto">
+                <img src="MochiTrip.svg" alt="Logo de MochiTrip" class="h-1/3-screen max-w-full h-auto md:h-auto">
             </div>
             <div class="w-full md:w-1/2 p-8 text-center">
                 <nav class="absolute top-4 right-4 space-x-2" aria-label="Selección de idioma">
@@ -56,7 +56,7 @@
                 </nav>
                 <h1 class="text-4xl font-black">{{ $t('title') }}</h1>
                 <h2 class="text-3xl text-gray-400 font-bold mb-4">{{ $t('soon') }}</h2>
-                <p class="text-gray-600 mb-8">{{ $t('description') }}</p>
+                <p class="text-gray-600 mb-4">{{ $t('description') }}</p>
                 <form @submit.prevent="onSubmit" class="space-y-4">
                     <label for="email" class="sr-only">{{ $t('placeholder') }}</label>
                     <input type="email" id="email" v-model="email" :placeholder="$t('placeholder')" required
