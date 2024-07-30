@@ -56,7 +56,7 @@
                 </nav>
                 <h1 class="text-4xl font-black">{{ $t('title') }}</h1>
                 <h2 class="text-3xl text-gray-400 font-bold mb-4">{{ $t('soon') }}</h2>
-                <p class="text-gray-600 mb-4">{{ $t('description') }}</p>
+                <p class="text-gray-600">{{ $t('description') }}</p>
                 <form @submit.prevent="onSubmit" class="space-y-4">
                     <label for="email" class="sr-only">{{ $t('placeholder') }}</label>
                     <input type="email" id="email" v-model="email" :placeholder="$t('placeholder')" required
