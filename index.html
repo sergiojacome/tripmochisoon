@@ -204,7 +204,8 @@
                             },
                             body: JSON.stringify({
                                 email: email.value,
-                                'g-recaptcha-response': recaptchaToken
+                                'g-recaptcha-response': recaptchaToken,
+                                language: i18n.global.locale.value
                             })
                         });
 
