@@ -169,11 +169,9 @@
                 const subscribed = ref(false)
                 const emailError = ref('')
                 const messageState = ref({ type: null, message: '' })
-                console.log(i18n.global.locale.value)
 
                 const changeLanguage = (lang) => {
                     i18n.global.locale.value = lang;
-                    console.log(i18n.global.locale.value)
                 }
 
                 const validateEmail = (email) => {
@@ -181,7 +179,6 @@
                 }
 
                 const onSubmit = async () => {
-                    console.log('ONSUBMIT', i18n.global.locale.value)
                     if (!email.value.trim()) {
                         messageState.value = { type: 'error', message: i18n.global.t('emailRequired') };
                         return;
