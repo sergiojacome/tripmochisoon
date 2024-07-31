@@ -18,6 +18,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-i18n@9/dist/vue-i18n.global.prod.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=TU_CLAVE_DE_SITIO_RECAPTCHA"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Merriweather:wght@700&display=swap"
         rel="stylesheet">
@@ -69,18 +70,22 @@
                 <h1 class="text-4xl font-black">{{ $t('title') }}</h1>
                 <h2 class="text-2xl text-gray-400 font-bold mb-4">{{ $t('soon') }}</h2>
                 <p class="text-gray-600">{{ $t('description') }}</p>
-                <form @submit.prevent="onSubmit" class="space-y-4">
+                <form @submit.prevent="onSubmit" class="space-y-4" novalidate>
                     <label for="email" class="sr-only">{{ $t('placeholder') }}</label>
-                    <input type="email" id="email" v-model="email" :placeholder="$t('placeholder')" required
+                    <input type="text" id="email" v-model="email" :placeholder="$t('placeholder')"
                         class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         autofocus>
+                    <p v-if="messageState && messageState.message"
+                        :class="{ 'text-green-600': messageState.type === 'success', 'text-red-500': messageState.type === 'error' }"
+                        class="text-sm mt-1" role="alert">
+                        {{ messageState.message }}
+                    </p>
                     <button type="submit"
                         class="w-full text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 text-lg"
                         style="background: #003366;">
                         {{ $t('submit') }}
                     </button>
                 </form>
-                <p v-if="subscribed" class="mt-4 text-green-600" role="alert">{{ $t('success') }}</p>
                 <p class="mt-4 text-sm text-gray-500">{{ $t('freeService') }}</p>
                 <div class="mt-8">
                     <p class="text-sm text-gray-500">{{ $t('followUs') }}</p>
@@ -110,7 +115,6 @@
     <script>
         const { createApp, ref } = Vue
         const { createI18n } = VueI18n
-
         const i18n = createI18n({
             locale: 'es',
             fallbackLocale: 'es',
@@ -123,7 +127,10 @@
                     "submit": "Quiero ser el primero",
                     "success": "¡Gracias! Te avisaremos cuando estemos listos.",
                     "followUs": "Síguenos para más novedades",
-                    "freeService": "MochiTrip es y siempre será gratuito"
+                    "freeService": "MochiTrip es y siempre será gratuito",
+                    "emailRequired": "Por favor, ingresa tu correo electrónico.",
+                    "emailInvalid": "Por favor, ingresa un correo electrónico válido.",
+                    "error": "Hubo un error al enviar tu correo. Por favor, intenta de nuevo."
                 },
                 "en": {
                     "title": "MochiTrip.com",
@@ -133,7 +140,10 @@
                     "submit": "I want to be first",
                     "success": "Thank you! We'll let you know when we're ready.",
                     "followUs": "Follow us for more updates",
-                    "freeService": "MochiTrip is and will always be free"
+                    "freeService": "MochiTrip is and will always be free",
+                    "emailRequired": "Please enter your email address.",
+                    "emailInvalid": "Please enter a valid email address.",
+                    "error": "There was an error submitting your email. Please try again."
                 },
                 "pt": {
                     "title": "MochiTrip.com",
@@ -143,7 +153,10 @@
                     "submit": "Quero ser o primeiro",
                     "success": "Obrigado! Avisaremos quando estivermos prontos.",
                     "followUs": "Siga-nos para mais novidades",
-                    "freeService": "MochiTrip é e sempre será gratuito"
+                    "freeService": "MochiTrip é e sempre será gratuito",
+                    "emailRequired": "Por favor, digite seu endereço de e-mail.",
+                    "emailInvalid": "Por favor, digite um endereço de e-mail válido.",
+                    "error": "Houve um erro ao enviar seu e-mail. Por favor, tente novamente."
                 }
             }
         })
@@ -152,20 +165,64 @@
             setup() {
                 const email = ref('')
                 const subscribed = ref(false)
-
-                const onSubmit = () => {
-                    console.log(email.value)
-                    subscribed.value = true
-                    email.value = ''
-                }
+                const emailError = ref('')
+                const messageState = ref({ type: null, message: '' })
 
                 const changeLanguage = (lang) => {
-                    i18n.global.locale = lang
+                    i18n.global.locale.value = lang
+                }
+
+                const validateEmail = (email) => {
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                }
+
+                const onSubmit = async () => {
+                    if (!email.value.trim()) {
+                        messageState.value = { type: 'error', message: i18n.global.t('emailRequired') };
+                        return;
+                    }
+                    if (!validateEmail(email.value)) {
+                        messageState.value = { type: 'error', message: i18n.global.t('emailInvalid') };
+                        return;
+                    }
+                    messageState.value = { type: null, message: '' };
+
+                    try {
+                        if (typeof grecaptcha === 'undefined') {
+                            throw new Error('reCAPTCHA not loaded');
+                        }
+                        const recaptchaToken = await new Promise((resolve) => {
+                            grecaptcha.ready(() => {
+                                grecaptcha.execute('6LeK7xoqAAAAAGLvtJepA8ZhDr3K96YHjrF6-fnc', { action: 'submit' }).then(resolve)
+                            })
+                        })
+
+                        const response = await fetch('https://formspree.io/f/mqazqpqq', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: email.value,
+                                'g-recaptcha-response': recaptchaToken
+                            })
+                        });
+
+                        if (response.ok) {
+                            messageState.value = { type: 'success', message: i18n.global.t('success') };
+                            email.value = '';
+                        } else {
+                            throw new Error('Submission failed');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        messageState.value = { type: 'error', message: i18n.global.t('error') };
+                    }
                 }
 
                 return {
                     email,
-                    subscribed,
+                    messageState,
                     onSubmit,
                     changeLanguage
                 }
