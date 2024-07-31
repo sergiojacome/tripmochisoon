@@ -16,23 +16,18 @@
     <meta property="og:url" content="https://mochitrip.com">
     <meta property="og:type" content="website">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-i18n@9/dist/vue-i18n.global.prod.js"></script>
-
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Merriweather:wght@700&display=swap"
         rel="stylesheet">
     <style>
         body {
             font-family: 'Merriweather', sans-serif;
-            background: url(bg1_light.png) repeat;
+            background: url(bg1.png) repeat;
         }
 
-        button {
-            font-family: 'Inter', serif;
-        }
-
+        button,
         h1,
         h2 {
             font-family: 'Inter', serif;
@@ -47,20 +42,15 @@
     </style>
 </head>
 
-<body id="app" class="bg-gray-100 min-h-screen flex flex-col">
-
-
-    <div class="flex-grow flex flex-col items-center justify-center p-4">
-        <div class="text-center mb-4 mt-12 md:mt-0">
-            <h1 class="text-4xl md:text-6xl font-black">{{ $t('title') }}</h1>
-            <h2 class="text-3xl text-gray-400 font-bold">{{ $t('soon') }}</h2>
-        </div>
-        <main class="max-w-4xl w-full overflow-hidden flex flex-col md:flex-row">
-            <div class="w-full md:w-1/2 flex items-center justify-center p-0">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <div id="app" class="flex-grow flex items-center justify-center p-4">
+        <main class="max-w-4xl w-full bg-white rounded-lg shadow-xl overflow-hidden flex flex-col md:flex-row">
+            <div class="w-full md:w-1/2 bg-blue-500 flex items-center justify-center p-8 md:p-0"
+                style="background: url('https://www.transparenttextures.com/patterns/beige-paper.png') repeat #faf0e6;">
                 <img src="MochiTrip.svg" alt="Logo de MochiTrip"
                     class="max-h-48 max-w-full h-auto md:h-auto md:max-h-full">
             </div>
-            <div class="w-full md:w-1/2 py-4 px-8 md:p-8 text-center">
+            <div class="w-full md:w-1/2 p-8 text-center">
                 <nav class="absolute m-auto top-4 right-4 space-x-2" aria-label="Selección de idioma">
                     <button @click="changeLanguage('es')"
                         :class="{'active-lang': $i18n.locale === 'es', 'font-bold': $i18n.locale === 'es'}"
@@ -76,7 +66,9 @@
                         :aria-label="$t('changeToPortuguese')">Português</button>
 
                 </nav>
-                <p class="text-gray-600 text-sm md:text-base">{{ $t('description') }}</p>
+                <h1 class="text-4xl font-black">{{ $t('title') }}</h1>
+                <h2 class="text-2xl text-gray-400 font-bold mb-4">{{ $t('soon') }}</h2>
+                <p class="text-gray-600">{{ $t('description') }}</p>
                 <form @submit.prevent="onSubmit" class="space-y-4">
                     <label for="email" class="sr-only">{{ $t('placeholder') }}</label>
                     <input type="email" id="email" v-model="email" :placeholder="$t('placeholder')" required
@@ -162,7 +154,6 @@
                 const subscribed = ref(false)
 
                 const onSubmit = () => {
-                    // Here you would handle the subscription logic
                     console.log(email.value)
                     subscribed.value = true
                     email.value = ''
